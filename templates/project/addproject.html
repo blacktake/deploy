@@ -1,0 +1,328 @@
+{{ define "project/addproject.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>hello {{.username}} <small>～～.</small></h5>
+                </div>
+                <div class="ibox-content">
+                     <form id="publishform" class="form-horizontal">
+                        <div class="form-group" id="form-group-task_name"><label class="col-sm-2 control-label">任务名称</label>
+                            <div class="col-sm-10"><input type="text" class="form-control" id="task_name" name="task_name" placeholder="发布任务的名称,如4.7版本发布，修改某某bug发布" required=""></div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">选择环境</label>
+                            <div class="col-sm-10">
+                                <select class="form-control m-b" name="environment_type">	
+                                    <option value ="1" selected='selected'>正式环境</option>
+                                    <option value ="2">压测环境</option>
+                                    <option value ="3">预发布环境</option>
+                                    <option value ="4">仿真环境(50.93)</option>	
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">选择分组</label>
+                            <div class="col-sm-10">
+                                <select class="form-control m-b" name="group">
+                                    
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group" id="form-group-version"><label class="col-sm-2 control-label">发布分支名称</label>
+                            <div class="col-sm-10">
+                                <select class="form-control m-b" name="version">	
+                                    {{if .branchList}}
+                                    {{range $k, $v := .branchList}}
+                                    <option value ="{{$v}}">{{$v}}</option>
+                                    {{end}}
+                                    {{end}}
+                                </select>
+                                <!--
+                                <input type="text" class="form-control" id="version" name="version" placeholder="发布的分支名称，如release-20160930 注意不可缺省" required="">
+                                -->
+                                <input type="hidden" class="form-control" id="username" name="username" value="{{.username}}">
+                            </div>
+                        </div>
+						
+						<div class="form-group" id="form-group-task_name"><label class="col-sm-2 control-label">邮件接收人</label>
+                            <div class="col-sm-10"><input type="text" class="form-control" id="email_list" name="email_list" placeholder="英文分号分隔如:abc@mia.com;abc@mia.com" ></div>
+                        </div>
+						<div class="form-group" id="form-group-task_name"><label class="col-sm-2 control-label">功能介绍</label>
+                            <div class="col-sm-10"><textarea class="form-control" row='5' col="20" id="functional_introduction" name="functional_introduction" placeholder="功能介绍,产品经理,测试" ></textarea></div>
+                        </div>
+						
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">	
+                            <button class="btn btn-primary" id="publish">发布</button>
+                            <button class="btn btn-white" id="cancel">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "script"}}
+<script type="text/javascript">
+$(document).ready(function(){
+	var zhengshi_group = ["api", "cart", "order", 'thirdservice', 'recommend', "couponmq", "activationmq"];			
+	var yace_group = ["pressure", "pressurecart"];
+	var yufabu_group = ["prerelease"];
+	var fangzhen_group = ["test"];
+	var selected_value = $("select[name='environment_type']").val();
+	if(selected_value == 1){
+		$("select[name='group']").empty();
+		//循环添加
+		for(var i = 0; i < zhengshi_group.length; i++) {
+			var option = $("<option>").val(zhengshi_group[i]).text(zhengshi_group[i]);
+			$("select[name='group']").append(option);
+		}	
+	}else if(selected_value ==2){
+		$("select[name='group']").empty();
+		for(var i = 0; i < yace_group.length; i++) {
+			var option = $("<option>").val(yace_group[i]).text(yace_group[i]);
+			$("select[name='group']").append(option);
+		}			
+	}else if(selected_value ==3){
+		$("select[name='group']").empty();
+		for(var i = 0; i < yufabu_group.length; i++) {
+			var option = $("<option>").val(yufabu_group[i]).text(yufabu_group[i]);
+			$("select[name='group']").append(option);
+		}			
+	}else if(selected_value ==4){
+		$("select[name='group']").empty();
+		for(var i = 0; i < fangzhen_group.length; i++) {
+			var option = $("<option>").val(fangzhen_group[i]).text(fangzhen_group[i]);
+			$("select[name='group']").append(option);
+		}			
+	}
+	$("select[name='environment_type']").change(function() {
+		var selected_value = $(this).val();  
+		if(selected_value == 1){
+			$("select[name='group']").empty();
+			//循环添加
+			for(var i = 0; i < zhengshi_group.length; i++) {
+				var option = $("<option>").val(zhengshi_group[i]).text(zhengshi_group[i]);
+				$("select[name='group']").append(option);
+			}	
+		}else if(selected_value ==2){
+			$("select[name='group']").empty();
+			for(var i = 0; i < yace_group.length; i++) {
+				var option = $("<option>").val(yace_group[i]).text(yace_group[i]);
+				$("select[name='group']").append(option);
+			}			
+		}else if(selected_value ==3){
+			$("select[name='group']").empty();
+			for(var i = 0; i < yufabu_group.length; i++) {
+				var option = $("<option>").val(yufabu_group[i]).text(yufabu_group[i]);
+				$("select[name='group']").append(option);
+			}			
+		}else if(selected_value ==4){
+			$("select[name='group']").empty();
+			for(var i = 0; i < fangzhen_group.length; i++) {
+				var option = $("<option>").val(fangzhen_group[i]).text(fangzhen_group[i]);
+				$("select[name='group']").append(option);
+			}			
+		}
+	});
+	toastr.options = {
+          "closeButton": true,
+          "debug": false,
+          "progressBar": true,
+          "preventDuplicates": false,
+          "positionClass": "toast-top-center",
+          "onclick": null,
+          "showDuration": "400",
+          "hideDuration": "1000",
+          "timeOut": "2000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+	$("#cancel").click(function(){
+		location.href = '/deploy/project'	
+		return false;
+	});
+
+	$("#publish").click(function(){
+		$("#publishform").submit(function(){
+		    var task_name = $("#task_name").val();    
+		    var environment_type = $("select[name='environment_type']").val();    
+		    var group = $("select[name='group']").val();    
+		    var version =$("select[name='version']").val();   
+		    var username = $("#username").val();
+			var email_list = $("#email_list").val();
+			var functional_introduction = $("#functional_introduction").val();
+			if((!email_list && functional_introduction) || (email_list && !functional_introduction)){
+				alert("邮件接收人和功能介绍，要么都空，要么都填");
+				return false;
+			}
+			if(email_list && functional_introduction){
+				var b = new Base64();  
+	        	var functional_introduction_base64 = b.encode(functional_introduction);
+				var reg = /^((([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6}\;))*(([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})))$/;
+				if(!reg.test(str)){
+					alert("请输入正确邮件格式，如: aa@mia.com;bb@mia.com ");
+					return false;
+				}	
+			}
+		       $.ajax({
+			    type:"POST",
+                data: '{"user_name": "'+username +'","task_name": "' + task_name + '","environment_type" : "' + environment_type + '",  "group" : "' + group + '", "version" : "' + version + '","email_list":"'+email_list+'","functional_introduction":"'+functional_introduction_base64+'"}',
+			    url: "/deploy/addworkerajax",
+			    cache: false,
+			    dataType: "json",
+			    success: function(result, statues, xml){
+                    if(result.code ==1){
+                        location.href = '/deploy/project'
+                    } 
+                    if(result.code ==0){
+                        toastr.error(result.desc); 
+                        return false;
+                    }
+                    if (result.code == 3) {
+                        location.reload();
+                        return false;
+                    }
+			    },
+			    error: function(){
+                    toastr.error("警告你别来烦我了");
+                    //location.reload();
+                }
+             });
+            return false;
+		});
+	});	
+});
+
+
+function Base64() {
+ 
+    // private property
+    _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+ 
+    // public method for encoding
+    this.encode = function (input) {
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+        input = _utf8_encode(input);
+        while (i < input.length) {
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+            if (isNaN(chr2)) {
+                enc3 = enc4 = 64;
+            } else if (isNaN(chr3)) {
+                enc4 = 64;
+            }
+            output = output +
+            _keyStr.charAt(enc1) + _keyStr.charAt(enc2) +
+            _keyStr.charAt(enc3) + _keyStr.charAt(enc4);
+        }
+        return output;
+    }
+ 
+    // public method for decoding
+    this.decode = function (input) {
+        var output = "";
+        var chr1, chr2, chr3;
+        var enc1, enc2, enc3, enc4;
+        var i = 0;
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        while (i < input.length) {
+            enc1 = _keyStr.indexOf(input.charAt(i++));
+            enc2 = _keyStr.indexOf(input.charAt(i++));
+            enc3 = _keyStr.indexOf(input.charAt(i++));
+            enc4 = _keyStr.indexOf(input.charAt(i++));
+            chr1 = (enc1 << 2) | (enc2 >> 4);
+            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+            chr3 = ((enc3 & 3) << 6) | enc4;
+            output = output + String.fromCharCode(chr1);
+            if (enc3 != 64) {
+                output = output + String.fromCharCode(chr2);
+            }
+            if (enc4 != 64) {
+                output = output + String.fromCharCode(chr3);
+            }
+        }
+        output = _utf8_decode(output);
+        return output;
+    }
+ 
+    // private method for UTF-8 encoding
+    _utf8_encode = function (string) {
+        string = string.replace(/\r\n/g,"\n");
+        var utftext = "";
+        for (var n = 0; n < string.length; n++) {
+            var c = string.charCodeAt(n);
+            if (c < 128) {
+                utftext += String.fromCharCode(c);
+            } else if((c > 127) && (c < 2048)) {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            } else {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+ 
+        }
+        return utftext;
+    }
+ 
+    // private method for UTF-8 decoding
+    _utf8_decode = function (utftext) {
+        var string = "";
+        var i = 0;
+        var c = c1 = c2 = 0;
+        while ( i < utftext.length ) {
+            c = utftext.charCodeAt(i);
+            if (c < 128) {
+                string += String.fromCharCode(c);
+                i++;
+            } else if((c > 191) && (c < 224)) {
+                c2 = utftext.charCodeAt(i+1);
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                i += 2;
+            } else {
+                c2 = utftext.charCodeAt(i+1);
+                c3 = utftext.charCodeAt(i+2);
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                i += 3;
+            }
+        }
+        return string;
+    }
+}
+</script>
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}

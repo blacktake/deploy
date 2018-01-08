@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+
+<div class="middle-box text-center loginscreen animated fadeInDown">
+    <div>
+        <div>
+
+            <h1 class="logo-name">API+</h1>
+
+        </div>
+        <h3>Welcome to mia api admin system</h3>
+        <h3>做人，最重要的是开心啦</h3>
+        <!--<h3>
+        蜜芽api综合平台
+        </h3>-->
+        <form class="m-t" role="form" id="loginform">
+            <div class="form-group">
+                <input type="input" class="form-control" id="username" placeholder="Username" required="">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" placeholder="Password" required="">
+            </div>
+            <button class="btn btn-primary block full-width m-b submit">Login</button> 
+        </form>
+        <p class="m-t"> <small>Copyright Mia API Team © 2014-2017</small> </p>
+    </div>
+</div>
+{{ template "script" }}
+<script type="text/javascript">
+
+$(document).ready(function(){
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "progressBar": true,
+      "preventDuplicates": false,
+      "positionClass": "toast-top-center",
+      "onclick": null,
+      "showDuration": "400",
+      "hideDuration": "1000",
+      "timeOut": "2000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+
+
+    $('#loginform').submit(function(){
+        var username = $("#username").val();
+        var password = $("#password").val();
+        if (!username ){
+            toastr.error("请填写用户名");    
+            return;
+        }
+        if(!password){
+            toastr.error("请填写密码");  
+            return;
+        }
+         
+        $.ajax({
+            type:"POST",
+            data: '{"username": "' + username + '", "password" : "' + password + '"}',
+            url: "/siginajax", //后台处理函数的url 这里用的是static url 需要与urls.py中的name一致
+            cache: false,
+            dataType: "json",
+            //contentType:"application/json"
+            success: function(result, statues, xml){
+                if(result.code ==1){
+                    window.location.href = "/"
+                    return false;
+                } 
+                if(result.code == 0){
+                    toastr.error("用户名或密码错误");
+                    return false;
+                }
+                
+                return false;
+            },
+            error: function(){
+                toastr.error("警告你别来烦我了");
+                return false;
+                //location.reload();
+            }
+        });
+        return false; 
+      
+    });
+                        
+
+ });
+            
+
+</script>
+</body>
+</html>

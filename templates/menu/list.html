@@ -1,0 +1,266 @@
+{{ define "menu/list.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+
+ <div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                           新建菜单
+                        </button>
+                    </div>
+
+                    <div class="modal inmodal" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content animated bounceInRight">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">添加菜单</h4>
+                                    <small class="font-bold"></small>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label>菜单名</label> 
+                                        <input type="text" placeholder="Enter your menu name" class="form-control" name="menuname"  required="" id="menuName">
+                                        <label>菜单url</label> 
+                                        <input type="text" placeholder="Enter your menu url" class="form-control" name="menuurl"  id="url">
+                                        <label>模块名称</label> 
+                                        <input type="text" placeholder="Enter your module name" class="form-control" name="module_name"  id="module_name" required="">
+                                        <label>父菜单icon名</label> 
+                                        <input type="text" placeholder="Enter your icon name" class="form-control" name="icon"  id="icon">
+                                        <label>子菜单英文名</label> 
+                                        <input type="text" placeholder="Enter your children name" class="form-control" name="c_name"  id="c_name">
+                                        <label>父级菜单</label> 
+                                         <select class="form-control m-b" name="parentId">	
+                                            <option value ="0" selected='selected'>父级菜单</option>
+                                            {{ if .parentMenuList}}
+                                            {{range $k, $v := .parentMenuList}}
+                                            <option value ="{{$v.Id}}">{{$v.Name}}</option>
+                                            {{end}}
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="saveMenu">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dd" id="nestable2">
+                        <ol class="dd-list">
+                            {{if .menuList}}
+                            {{range $k, $menus := .menuList}}
+                            <li class="dd-item dd-nodrag" data-id="parent_{{$menus.Id}}">
+                                <div class="dd-handle">
+                                    <span class="pull-right"> 
+                                        <a href="/menu/edit?id={{$menus.Id}}" class="btn btn-xs btn-outline btn-danger">编辑</a> 
+                                    </span>
+                                    <span class="label label-info"><i class="fa fa-users"></i></span>{{$menus.Name}}  {{$menus.ModuleName}}  
+                                </div>
+                                <ol class="dd-list">
+                                    {{if $menus.ChildrenList}}
+                                    {{range $k, $childrenmen := $menus.ChildrenList}}
+                                    <li class="dd-item" data-id="children_{{$childrenmen.Id}}">
+                                        <div class="dd-handle">
+                                            <span class="pull-right"> 
+                                                <a href="/menu/edit?id={{$childrenmen.Id}}" class="btn btn-xs btn-outline btn-danger">编辑</a> 
+                                                <a onclick="deleteMenu({{$childrenmen.Id}})" class="btn btn-xs btn-outline btn-danger">删除</a>                                                      
+                                            </span>
+                                            <span class="label label-info"><i class="fa fa-cog"></i></span> {{$childrenmen.Name}} {{$childrenmen.ModuleName}}  {{$childrenmen.CName}}
+                                        </div>
+                                    </li>
+                                    {{end}}
+                                    {{end}}
+                                </ol>
+                            </li>
+                            {{ end }}
+                            {{ end }}
+                        </ol>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "script"}}
+<script src="/static/bootstrap/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/static/bootstrap/js/plugins/nestable/jquery.nestable.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "progressBar": true,
+      "preventDuplicates": false,
+      "positionClass": "toast-top-center",
+      "onclick": null,
+      "showDuration": "400",
+      "hideDuration": "1000",
+      "timeOut": "2000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    /*
+     var updateOutput = function (e) {
+         var list = e.length ? e : $(e.target),
+                 output = list.data('output');
+         
+         if (window.JSON) {
+            console.log(list.nestable('serialize')) 
+              
+             output.val(window.JSON.stringify(list.nestable('serialize')));//, null, 2));
+         } else {
+             output.val('JSON browser support required for this demo.');
+         }
+     };
+     */
+    
+    $('#nestable2').nestable({
+        group: 1,
+        maxDepth:2,
+    }).on('change', function(){
+			var r = $('.dd').nestable('serialize');
+           
+			console.log(11);
+			console.log(JSON.stringify(r));
+            $.ajax({
+                type:"POST",
+                data: {"data":JSON.stringify(r)},
+                url: "/menu/changemenuajax", 
+                cache: false,
+                dataType: "json",
+                success: function(result, statues, xml){
+                    if(result.code ==1){
+                       location.reload();
+                       return false;
+                    } 
+                    if(result.code ==0){
+                        toastr.error(result.desc);  
+                        //location.reload();
+                        return false;
+                    }
+                    if (result.code == 3) {
+                        location.reload();
+                        return false;
+                    }
+                },
+                error: function(){
+                    toastr.error("警告你别来烦我了");
+                    return false;
+                    location.reload();
+                }
+            });
+			
+		});
+     // activate Nestable for list 2
+    /*
+     $('#nestable2').nestable({
+        group: 2,
+        maxDepth:2,
+        
+     }).on('change', updateOutput);*/
+
+     // output initial serialised data
+     //updateOutput($('#nestable2').data('output', $('#nestable2-output')));
+
+
+    
+
+     $("#saveMenu").click(function(){
+        var menuname = $("#menuName").val()
+        var url = $("#url").val()
+        var parentId  = $("select[name='parentId']").val();    
+        var modulename  = $("#module_name").val()
+        var cname  = $("#c_name").val()
+        var icon  = $("#icon").val()
+        $.ajax({
+            type:"POST",
+            data: '{"name": "'+menuname +'","url": "' + url + '","parentid" : "'  + parentId +'","module_name" : "'+modulename+'","c_name" : "'+ cname + '","icon" : "'+ icon + '"}',
+            url: "/menu/addmenuajax", 
+            cache: false,
+            dataType: "json",
+            success: function(result, statues, xml){
+                if(result.code ==1){
+                   location.reload();
+                   return false;
+                } 
+                if(result.code ==0){
+                    toastr.error("添加菜单失败");  
+                    return false;
+                }
+                if (result.code == 3) {
+                    location.reload();
+                    return false;
+                }
+            },
+            error: function(){
+                toastr.error("警告你别来烦我了");
+                location.reload();
+                return false;
+            }
+        });
+     });
+
+ });
+
+function deleteMenu(id) {
+ swal({
+	title: "Are you sure?",
+	text: "你将删除这个菜单!",
+	type: "warning",
+	showCancelButton: true,
+	confirmButtonColor: "#DD6B55",
+	confirmButtonText: "Yes, delete it!",
+	closeOnConfirm: false
+    }, function () {
+        swal("Done!", "你的菜单已经被删除.", "success");
+        $.ajax({
+            type:"POST",
+            data: {"menuid":id},
+            url: "/menu/deletemenuajax", 
+            cache: false,
+            dataType: "json",
+            success: function(result, statues, xml){
+                if(result.code ==1){
+                   location.reload();
+                   return false;
+                } 
+                if(result.code ==0){
+                    toastr.error(result,desc);  
+                    return false;
+                }
+                if (result.code == 3) {
+                    location.reload();
+                    return false;
+                }
+            },
+            error: function(){
+                toastr.error("警告你别来烦我了");
+                location.reload();
+            }
+        });
+    });
+}
+</script>
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}

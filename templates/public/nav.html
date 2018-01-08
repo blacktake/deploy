@@ -1,0 +1,61 @@
+{{define "nav"}}
+<nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element"> 
+                        <span>
+                        </span>
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="table_data_tables.html#">
+                            <span class="clear"> 
+                            <span class="block m-t-xs"> 
+                                <strong class="font-bold"> {{if .username}}{{ .username }}{{end}} </strong>
+                            </span> 
+                            </span> 
+                        </a>
+                    </div>
+                    <div class="logo-element">
+                        API+
+                    </div>
+                </li>
+                {{if .menu}}
+                {{$moduleName := .moduleName}}
+                {{$ctrName := .ctrName}}
+                {{range $k,$v := .menu}}
+                <li {{if eq $moduleName $v.ModuleName }} class="active" {{end}}>
+                    <a id="deploy-menu"><i class="fa {{$v.Icon}}"></i> <span class="nav-label">{{$v.Name}}</span><span class="fa arrow"></span></a>
+                    {{if $v.ChildrenList}}
+                    <ul class="nav nav-second-level collapse">
+                        {{range $kk,$vv:=$v.ChildrenList}}
+                        <li {{if eq $ctrName  $vv.CName }} class="active" {{end}}><a href="{{$vv.Url}}">{{$vv.Name}}</a></li>
+                        {{end}}
+                    </ul>
+                    {{end}}
+                </li>
+                {{end}}
+                <!--
+                <li {{if eq .moduleName "deploy" }}class="active" {{end}} >
+                    <a id="deploy-menu"><i class="fa fa-table"></i> <span class="nav-label"> 代码部署</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li {{if eq .ctrName "project" }}class="active" {{end}} ><a href="/deploy/project">发布列表</a></li>
+                        <li {{if eq .ctrName "rollback" }}class="active" {{end}} ><a href="/deploy/rollbacklist">回滚列表</a></li>
+                    </ul>
+                </li>
+                <li {{if eq .moduleName "user" }}class="active" {{end}} >
+                    <a id="deploy-menu"><i class="fa fa-globe"></i> <span class="nav-label"> 用户管理</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li {{if eq .ctrName "user" }}class="active" {{end}}><a href="/user/userlist">人员列表</a></li>
+                    </ul>
+                </li>
+                <li {{if eq .moduleName "menu" }}class="active" {{end}} >
+                    <a id="deploy-menu"><i class="fa fa-sitemap"></i> <span class="nav-label"> 菜单管理</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li {{if eq .ctrName "menu" }}class="active" {{end}}><a href="/menu/list">菜单列表</a></li>
+                    </ul>
+                </li>
+                -->
+                {{end}}
+            </ul>
+        </div>
+</nav>
+{{ end }}

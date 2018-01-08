@@ -1,0 +1,259 @@
+{{ define "plusrollback/addrollback.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>hello {{.username}} <small>～～.</small></h5>
+                </div>
+                <div class="ibox-content">
+                     <form id="publishform" class="form-horizontal">
+                        <div class="form-group" id="form-group-task_name"><label class="col-sm-2 control-label">任务名称</label>
+                            <div class="col-sm-10"><input type="text" class="form-control" id="task_name" name="task_name" placeholder="发布任务的名称,如4.7版本发布，修改某某bug发布" required=""></div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">选择环境</label>
+                            <div class="col-sm-10">
+                                <select class="form-control m-b" name="environment_type">	
+                                    <option value ="1" selected='selected'>正式环境</option>
+                                    <option value ="2">预发布环境</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">选择分组</label>
+                            <div class="col-sm-10">
+                                <select class="form-control m-b" name="group">
+                                    
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group" id="form-group-version"><label class="col-sm-2 control-label">回滚分支名称</label>
+                            <div class="col-sm-10">
+                                <select class="form-control m-b" name="version">
+                                    
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">	
+                            <input type="hidden" class="form-control" id="username" name="username" value="{{.username}}">
+                            <button class="btn btn-primary" id="publish">发布</button>
+                            <button class="btn btn-white" id="cancel">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "script"}}
+<script type="text/javascript">
+$(document).ready(function(){
+	var zhengshi_group = ["plus", "mq"];			
+	var yufabu_group = ["prerelease"];
+	var selected_value = $("select[name='environment_type']").val();  
+	if(selected_value == 1){
+		$("select[name='group']").empty();
+		//循环添加
+		for(var i = 0; i < zhengshi_group.length; i++) {
+			var option = $("<option>").val(zhengshi_group[i]).text(zhengshi_group[i]);
+			$("select[name='group']").append(option);
+		}	
+	}else if(selected_value ==2){
+		$("select[name='group']").empty();
+		for(var i = 0; i < yufabu_group.length; i++) {
+			var option = $("<option>").val(yufabu_group[i]).text(yufabu_group[i]);
+			$("select[name='group']").append(option);
+		}			
+	}
+	$("select[name='environment_type']").change(function() {
+		var selected_value = $(this).val();  
+		if(selected_value == 1){
+			$("select[name='group']").empty();
+			//循环添加
+			for(var i = 0; i < zhengshi_group.length; i++) {
+				var option = $("<option>").val(zhengshi_group[i]).text(zhengshi_group[i]);
+				$("select[name='group']").append(option);
+			}	
+		}else if(selected_value ==2){
+			$("select[name='group']").empty();
+			for(var i = 0; i < yufabu_group.length; i++) {
+				var option = $("<option>").val(yufabu_group[i]).text(yufabu_group[i]);
+				$("select[name='group']").append(option);
+			}			
+		}
+	});
+    var selected_group_value = $("select[name='group']").val();  
+    $.ajax({
+        type:"POST",
+        data: {"groupname":selected_group_value},
+        url: "/deploy/plusshowversion",
+        cache: false,
+        dataType: "json",
+        success: function(result, statues, xml){
+            if(result.code ==1){
+                for (var i=0;i<result.projectList.length;i++){
+                    var option = $("<option>").val(result.projectList[i].version).text(result.projectList[i].version);
+                    $("select[name='version']").append(option);
+                }
+                return false;
+            } 
+            if(result.code ==0){
+                toastr.error(result.desc); 
+                return false;
+            }
+            if (result.code == 3) {
+                location.reload();
+                return false;
+            }
+        },
+        error: function(){
+            toastr.error("警告你别来烦我了");
+            return false;
+        }
+     });
+
+    $("select[name='environment_type']").change(function() {
+        var group_value = $("select[name='group']").val();  
+        $.ajax({
+			    type:"POST",
+                data: {"groupname":group_value},
+			    url: "/deploy/plusshowversion",
+			    cache: false,
+			    dataType: "json",
+			    success: function(result, statues, xml){
+                    if(result.code ==1){
+                        $("select[name='version']").empty();
+                        for (var i=0;i<result.projectList.length;i++){
+                            var option = $("<option>").val(result.projectList[i].version).text(result.projectList[i].version);
+                            $("select[name='version']").append(option);
+                        }
+                        return false;
+                    } 
+                    if(result.code ==0){
+                        toastr.error(result.desc); 
+                        return false;
+                    }
+                    if (result.code == 3) {
+                        location.reload();
+                        return false;
+                    }
+			    },
+			    error: function(){
+                    toastr.error("警告你别来烦我了");
+                    return false;
+                }
+             });
+    });
+    $("select[name='group']").change(function() {
+        var group_value = $(this).val();  
+        $.ajax({
+			    type:"POST",
+                data: {"groupname":group_value},
+			    url: "/deploy/plusshowversion",
+			    cache: false,
+			    dataType: "json",
+			    success: function(result, statues, xml){
+                    if(result.code ==1){
+                        $("select[name='version']").empty();
+                        for (var i=0;i<result.projectList.length;i++){
+                            var option = $("<option>").val(result.projectList[i].version).text(result.projectList[i].version);
+                            $("select[name='version']").append(option);
+                        }
+                        return false;
+                    } 
+                    if(result.code ==0){
+                        toastr.error(result.desc); 
+                        return false;
+                    }
+                    if (result.code == 3) {
+                        location.reload();
+                        return false;
+                    }
+			    },
+			    error: function(){
+                    toastr.error("警告你别来烦我了");
+                    return false;
+                }
+             });
+    })
+	toastr.options = {
+          "closeButton": true,
+          "debug": false,
+          "progressBar": true,
+          "preventDuplicates": false,
+          "positionClass": "toast-top-center",
+          "onclick": null,
+          "showDuration": "400",
+          "hideDuration": "1000",
+          "timeOut": "2000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+	$("#cancel").click(function(){
+		location.href = '/deploy/plusrollbacklist'	
+		return false;
+	});
+
+	$("#publish").click(function(){
+		$("#publishform").submit(function(){
+		       var task_name = $("#task_name").val();    
+		       var environment_type = $("select[name='environment_type']").val();    
+		       var group = $("select[name='group']").val();    
+		       var version = $("select[name='version']").val(); 
+		       var username = $("#username").val();      
+		       $.ajax({
+			    type:"POST",
+                data: '{"user_name": "'+username +'","task_name": "' + task_name + '","environment_type" : "' + environment_type + '",  "group" : "' + group + '", "version" : "' + version + '"}',
+			    url: "/deploy/plusaddrollbackorderajax",
+			    cache: false,
+			    dataType: "json",
+			    success: function(result, statues, xml){
+                    if(result.code ==1){
+                        location.href = '/deploy/plusrollbacklist'
+                    } 
+                    if(result.code ==0){
+                        toastr.error(result.desc); 
+                        return false;
+                    }
+                    if (result.code == 3) {
+                        location.reload();
+                        return false;
+                    }
+			    },
+			    error: function(){
+                    toastr.error("警告你别来烦我了");
+                    //location.reload();
+                }
+             });
+            return false;
+		});
+	});	
+});
+</script>
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}

@@ -1,0 +1,130 @@
+{{ define "log/loginlist.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+
+ <div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="row">
+                        <form method="GET" action="/log/loginlist">
+                            <div class="col-sm-4 m-b-xs">
+                                <input type="text" class="form-control" value="" placeholder="用户id" name="user_id">
+                            </div>
+                            <div class="col-sm-4 m-b-xs">
+                                <input type="text" class="form-control" value="" placeholder="手机号" name="cell_phone">
+                            </div>
+                            <div class="col-sm-4 m-b-xs">
+                                <input type="text" class="form-control" value="" placeholder="ip" name="ip">
+                            </div>
+                            <div class="col-sm-3 m-b-xs">
+                                <button class="btn btn-primary" type="submit">查询</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                        <table class="table table-striped table-bordered table-hover dataTables-example" >
+                        <thead>
+                            <th>user_id</th>
+                            <th>cell_phone</th>
+                            <th>device</th>
+                            <th>session</th>
+                            <th>version</th>
+                            <th>channel_code</th>
+                            <th>idfa</th>
+                            <th>dvc_id</th>
+                            <th>ip</th>
+                            <th>ua</th>
+                            <th>log_type</th>
+                            <th>create_time</th>
+                        </thead>
+                        <tbody>
+                            {{if .loglist}}
+                            {{$username := .username}}
+                            {{range $k, $v := .loglist}}
+                            <tr class="gradeX">
+                                <td>{{$v.User_id}}</td>
+                                <td>{{$v.Cell_phone}}</td>
+                                <td><label data-toggle="popover" data-placement="auto left">{{$v.Device}}</label></td>
+                                <td><label data-toggle="popover" data-placement="auto left">{{$v.Session}}</label></td>
+                                <td> {{$v.Version}}</td>
+                                <td><label data-toggle="popover" data-placement="auto left"> {{$v.Channel_code}}</label></td>
+                                <td>{{$v.Idfa}}</td>
+                                <td>{{$v.Dvc_id}}</td>
+                                <td><label data-toggle="popover" data-placement="auto left"> {{$v.Ip}}</label> </td>
+                                <td><label data-toggle="popover" data-placement="auto left"> {{$v.Ua}}</label> </td>
+                                <td> {{$v.Log_type}} </td>
+                                <td><label data-toggle="popover" data-placement="auto left"> {{$v.Create_time.Format "2006-01-02 15:04:05"}}</label> </td>
+                            </tr> 
+                            {{end}}
+                            {{end}}
+                        </tbody>
+                        </table>
+                        <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+                            {{if gt .paginator.PageNums 1}}
+                            <ul class="pagination">
+                                {{if .paginator.HasPrev}}
+                                <li class="footable-page-arrow">
+                                    <a data-page="first" href="{{.paginator.PageLinkFirst}}">«</a>
+                                </li>
+                                <li class="footable-page-arrow">
+                                    <a data-page="prev" href="{{.paginator.PageLinkPrev}}">‹</a>
+                                </li>
+                                {{else}}
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="first">«</a>
+                                </li>
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="prev">‹</a>
+                                </li>
+                                {{end}}
+                                {{range $index, $page := .paginator.Pages}}
+                                <li class="paginate_button {{if $.paginator.IsActive .}}active{{end}}">
+                                    <a href="{{$.paginator.PageLink $page}}" aria-controls="editable" data-dt-idx="{{$page}}" tabindex="0">{{$page}}</a>
+                                </li>
+                                {{end}}
+                                {{if .paginator.HasNext}}
+                                <li class="footable-page-arrow">
+                                    <a data-page="next" href="{{.paginator.PageLinkNext}}">›</a>
+                                </li>
+                                <li class="footable-page-arrow">
+                                    <a data-page="last" href="{{.paginator.PageLinkLast}}">»</a>
+                                </li>
+                                {{else}}
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="next">›</a>
+                                </li>
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="last">»</a>
+                                </li>
+                                {{end}}
+                            </ul>
+                            {{end}}
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "script"}}
+<script src="/static/bootstrap/js/plugins/dataTables/datatables.min.js"></script>
+<script src="/static/bootstrap/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}

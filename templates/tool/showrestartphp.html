@@ -1,0 +1,381 @@
+{{ define "tool/showrestartphp.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+
+ <div class="wrapper wrapper-content animated fadeInRight">
+     <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>一键重启php</h5>
+                </div>
+
+                <div class="ibox-content">
+
+                    <strong>重启涉及（api分组，cart分组，order分组， all）.</strong>
+
+                    <p>
+                    对每个分组重启php服务器! <font color="#FF0000">请慎重使用</font> 
+                    </p>
+
+                    <div class="row text-center">
+                        <div class="col-lg-6 h-100 p-lg">
+                            <p> 重启api php. </p>
+                            <button class="btn btn-danger btn-sm restartapi">Restart Api php</button>
+                        </div>
+                        <div class="col-lg-6 h-100 p-lg">
+                            <p> 重启cart php. </p>
+                            <button class="btn btn-danger btn-sm restartcart">Restart Cart php</button>
+                        </div>
+                        <div class="col-lg-6 h-100 p-lg">
+                            <p> 重启order php. </p>
+                            <button class="btn btn-danger btn-sm restartorder">Restart Order php</button>
+                        </div>
+                        <div class="col-lg-6 h-100 p-lg">
+                            <p> 重启所有 php. </p>
+                            <button class="btn btn-danger btn-sm restartall">Restart All php</button>
+                        </div>
+                        <!--
+                        <div class="col-lg-6 h-100 p-lg">
+                            <p> 重启recommend php. </p>
+                            <button class="btn btn-danger btn-sm restartrecommend">Restart Recommend php</button>
+                        </div>
+                        <div class="col-lg-6 h-100 p-lg">
+                            <p> 重启thirdserive php. </p>
+                            <button class="btn btn-danger btn-sm restartthird">Restart Thirdservice php</button>
+                        </div>
+                        -->
+                    </div>
+                    <div class="m-t-md">
+                        <p>
+                            结果展示:
+                        </p>
+
+                        <pre id="showresult">
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "script"}}
+<script type="text/javascript">
+$(document).ready(function(){
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "progressBar": true,
+      "preventDuplicates": false,
+      "positionClass": "toast-top-center",
+      "onclick": null,
+      "showDuration": "400",
+      "hideDuration": "1000",
+      "timeOut": "2000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+
+
+    
+    $('.restartapi').click(function () {
+        swal({
+            title: "Are you sure?",
+            text: "Your will restart api php!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Do it!",
+            cancelButtonText: "No, cancel plx!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },function (isConfirm) {
+            if (isConfirm) {
+                swal("Done!", "The api php has been Restarted.", "success");
+                $.ajax({
+                    type:"POST",
+                    data: {"type":"api"},
+                    url: "/tool/restartphpajax", 
+                    cache: false,
+                    timeout : 1000*180,
+                    dataType: "json",
+                    success: function(result, statues, xml){
+                        if(result.code ==1){
+                           toastr.success("重启了"); 
+                           $("#showresult").html(result.content)
+                           return false;
+                        } 
+                        if(result.code ==0){
+                            toastr.error("重启失败");  
+                            return false;
+                        }
+                        if (result.code == 3) {
+                            location.reload();
+                            return false;
+                        }
+                    },
+                    error: function(){
+                        toastr.error("警告你别来烦我了");
+                        location.reload();
+                    }
+                });
+            } else {
+                swal("Cancelled", "Your cancel restart api php :)", "error");
+            }
+        });
+    });
+
+    $('.restartcart').click(function () {
+        swal({
+            title: "Are you sure?",
+            text: "Your will restart cart php!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Do it!",
+            cancelButtonText: "No, cancel plx!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },function (isConfirm) {
+            if (isConfirm) {
+                swal("Done!", "The cart php has been Restarted.", "success");
+                $.ajax({
+                    type:"POST",
+                    data: {"type":"cart"},
+                    url: "/tool/restartphpajax", 
+                    cache: false,
+                    timeout : 1000*180,
+                    dataType: "json",
+                    success: function(result, statues, xml){
+                        if(result.code ==1){
+                           toastr.success("重启了"); 
+                           $("#showresult").html(result.content)
+                           return false;
+                        } 
+                        if(result.code ==0){
+                            toastr.error("重启失败");  
+                            return false;
+                        }
+                        if (result.code == 3) {
+                            location.reload();
+                            return false;
+                        }
+                    },
+                    error: function(){
+                        toastr.error("警告你别来烦我了");
+                        location.reload();
+                    }
+                });
+            } else {
+                swal("Cancelled", "Your cancel restart cart php :)", "error");
+            }
+        });
+    });
+
+    $('.restartorder').click(function () {
+        swal({
+            title: "Are you sure?",
+            text: "Your will restart order php!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Do it!",
+            cancelButtonText: "No, cancel plx!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },function (isConfirm) {
+            if (isConfirm) {
+                swal("Done!", "The order php has been Restarted.", "success");
+                $.ajax({
+                    type:"POST",
+                    data: {"type":"order"},
+                    url: "/tool/restartphpajax", 
+                    cache: false,
+                    timeout : 1000*180,
+                    dataType: "json",
+                    success: function(result, statues, xml){
+                        if(result.code ==1){
+                           toastr.success("重启了"); 
+                           $("#showresult").html(result.content)
+                           return false;
+                        } 
+                        if(result.code ==0){
+                            toastr.error("重启失败");  
+                            return false;
+                        }
+                        if (result.code == 3) {
+                            location.reload();
+                            return false;
+                        }
+                    },
+                    error: function(){
+                        toastr.error("警告你别来烦我了");
+                        location.reload();
+                    }
+                });
+            } else {
+                swal("Cancelled", "Your cancel restart order php :)", "error");
+            }
+        });
+    });
+
+    $('.restartall').click(function () {
+        swal({
+            title: "Are you sure?",
+            text: "Your will restart all php!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Do it!",
+            cancelButtonText: "No, cancel plx!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },function (isConfirm) {
+            if (isConfirm) {
+                swal("Done!", "The all php has been Restarted.", "success");
+                $.ajax({
+                    type:"POST",
+                    data: {"type":"all"},
+                    url: "/tool/restartphpajax", 
+                    cache: false,
+                    timeout : 1000*180,
+                    dataType: "json",
+                    success: function(result, statues, xml){
+                        if(result.code ==1){
+                           toastr.success("重启了"); 
+                           $("#showresult").html(result.content)
+                           return false;
+                        } 
+                        if(result.code ==0){
+                            toastr.error("重启失败");  
+                            return false;
+                        }
+                        if (result.code == 3) {
+                            location.reload();
+                            return false;
+                        }
+                    },
+                    error: function(){
+                        toastr.error("警告你别来烦我了");
+                        location.reload();
+                    }
+                });
+            } else {
+                swal("Cancelled", "Your cancel restart all php :)", "error");
+            }
+        });
+    });
+
+    $('.restartrecommend').click(function () {
+        swal({
+            title: "Are you sure?",
+            text: "Your will restart recommend php!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Do it!",
+            cancelButtonText: "No, cancel plx!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },function (isConfirm) {
+            if (isConfirm) {
+                swal("Done!", "The recommend php has been Restarted.", "success");
+                $.ajax({
+                    type:"POST",
+                    data: {"type":"recommend"},
+                    url: "/tool/restartphpajax", 
+                    cache: false,
+                    timeout : 1000*180,
+                    dataType: "json",
+                    success: function(result, statues, xml){
+                        if(result.code ==1){
+                           toastr.success("重启了"); 
+                           $("#showresult").html(result.content)
+                           return false;
+                        } 
+                        if(result.code ==0){
+                            toastr.error("重启失败");  
+                            return false;
+                        }
+                        if (result.code == 3) {
+                            location.reload();
+                            return false;
+                        }
+                    },
+                    error: function(){
+                        toastr.error("警告你别来烦我了");
+                        location.reload();
+                    }
+                });
+            } else {
+                swal("Cancelled", "Your cancel restart recommend php :)", "error");
+            }
+        });
+    });
+
+    $('.restartthird').click(function () {
+        swal({
+            title: "Are you sure?",
+            text: "Your will restart thirdservice php!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Do it!",
+            cancelButtonText: "No, cancel plx!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },function (isConfirm) {
+            if (isConfirm) {
+                swal("Done!", "The thirdservice php has been Restarted.", "success");
+                $.ajax({
+                    type:"POST",
+                    data: {"type":"thirdservice"},
+                    url: "/tool/restartphpajax", 
+                    cache: false,
+                    timeout : 1000*180,
+                    dataType: "json",
+                    success: function(result, statues, xml){
+                        if(result.code ==1){
+                           toastr.success("重启了"); 
+                           $("#showresult").html(result.content)
+                           return false;
+                        } 
+                        if(result.code ==0){
+                            toastr.error("重启失败");  
+                            return false;
+                        }
+                        if (result.code == 3) {
+                            location.reload();
+                            return false;
+                        }
+                    },
+                    error: function(){
+                        toastr.error("警告你别来烦我了");
+                        location.reload();
+                    }
+                });
+            } else {
+                swal("Cancelled", "Your cancel restart thirdservice php :)", "error");
+            }
+        });
+    });
+
+});
+</script>
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}

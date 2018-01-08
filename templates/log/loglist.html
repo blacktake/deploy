@@ -1,0 +1,137 @@
+{{ define "log/loglist.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+
+ <div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="row">
+                        <form method="GET" action="/log/loglist">
+                            <div class="col-sm-4 m-b-xs" id="data_1">
+                                <div class="input-group date">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                    <input type="text" class="form-control" value="" placeholder="日期" name="dt">
+                                </div>
+                            </div>
+                            <div class="col-sm-4 m-b-xs">
+                                <input type="text" class="form-control" value="" placeholder="接口名" name="api">
+                            </div>
+                            <div class="col-sm-3 m-b-xs">
+                                <button class="btn btn-primary" type="submit">查询</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                        <table class="table table-striped table-bordered table-hover dataTables-example" >
+                        <thead>
+                            <th>日期</th>
+                            <th>接口名</th>
+                            <th>iOS请求数</th>
+                            <th>android请求数</th>
+                            <th>其他请求数</th>
+                            <th>总请求数</th>
+                            <th>最小用时</th>
+                            <th>最大用时</th>
+                            <th>平均用时</th>
+                        </thead>
+                        <tbody>
+                            {{if .loglist}}
+                            {{$username := .username}}
+                            {{range $k, $v := .loglist}}
+                            <tr class="gradeX">
+                                <td>{{$v.Dt}}</td>
+                                <td>{{$v.Api}}</td>
+                                <td><label data-toggle="popover" data-placement="auto left">{{$v.Ios_request}}</label></td>
+                                <td><label data-toggle="popover" data-placement="auto left">{{$v.Android_request}}</label></td>
+                                <td> {{$v.Other_request}}</td>
+                                <td><label data-toggle="popover" data-placement="auto left"> {{$v.Total_request}}</label></td>
+                                <td>{{$v.Min_time}}</td>
+                                <td>{{$v.Max_time}}</td>
+                                <td><label data-toggle="popover" data-placement="auto left"> {{$v.Avg_time}}</label> </td>
+                            </tr> 
+                            {{end}}
+                            {{end}}
+                        </tbody>
+                        </table>
+                        <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+                            {{if gt .paginator.PageNums 1}}
+                            <ul class="pagination">
+                                {{if .paginator.HasPrev}}
+                                <li class="footable-page-arrow">
+                                    <a data-page="first" href="{{.paginator.PageLinkFirst}}">«</a>
+                                </li>
+                                <li class="footable-page-arrow">
+                                    <a data-page="prev" href="{{.paginator.PageLinkPrev}}">‹</a>
+                                </li>
+                                {{else}}
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="first">«</a>
+                                </li>
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="prev">‹</a>
+                                </li>
+                                {{end}}
+                                {{range $index, $page := .paginator.Pages}}
+                                <li class="paginate_button {{if $.paginator.IsActive .}}active{{end}}">
+                                    <a href="{{$.paginator.PageLink $page}}" aria-controls="editable" data-dt-idx="{{$page}}" tabindex="0">{{$page}}</a>
+                                </li>
+                                {{end}}
+                                {{if .paginator.HasNext}}
+                                <li class="footable-page-arrow">
+                                    <a data-page="next" href="{{.paginator.PageLinkNext}}">›</a>
+                                </li>
+                                <li class="footable-page-arrow">
+                                    <a data-page="last" href="{{.paginator.PageLinkLast}}">»</a>
+                                </li>
+                                {{else}}
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="next">›</a>
+                                </li>
+                                <li class="footable-page-arrow disabled">
+                                    <a data-page="last">»</a>
+                                </li>
+                                {{end}}
+                            </ul>
+                            {{end}}
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "script"}}
+<script src="/static/bootstrap/js/plugins/dataTables/datatables.min.js"></script>
+<script src="/static/bootstrap/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+<script type="text/javascript">
+ $('#data_1 .input-group.date').datepicker({
+    todayBtn: "linked",
+    keyboardNavigation: false,
+    format:"yyyy-mm-dd",
+    language: 'cn',
+    forceParse: false,
+    calendarWeeks: true,
+    autoclose: true
+});
+
+</script>
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}

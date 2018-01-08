@@ -1,0 +1,231 @@
+{{ define "monitor/mqlist.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+<meta http-equiv="refresh" content="90">
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+
+ <div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        {{if .couponMq}}
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{{.couponMq.MqName}} </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div id="couponmq"></div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        {{if .redbagMq}}
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{{.redbagMq.MqName}} </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div id="redbagmq"></div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        {{if .indexActivationMq}}
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{{.indexActivationMq.MqName}} </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div id="indexactivation"></div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        {{if .amqpWriteUserIdMq}}
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{{.amqpWriteUserIdMq.MqName}} </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div id="writeuserid"></div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        {{if .saveDeviceInfoMq}}
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{{.saveDeviceInfoMq.MqName}} </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div id="savedevice"></div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{template "script"}}
+<script src="/static/bootstrap/js/plugins/morris/raphael-2.1.0.min.js"></script>
+<script src="/static/bootstrap/js/plugins/morris/morris.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "progressBar": true,
+      "preventDuplicates": false,
+      "positionClass": "toast-top-center",
+      "onclick": null,
+      "showDuration": "400",
+      "hideDuration": "1000",
+      "timeOut": "2000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    var couponmqlist = []
+    {{if .couponMq}}
+    {{range $k, $v := .couponMq.Mqinfos}}
+        var couponmqinfo = {}
+        couponmqinfo.y = "mq_"+{{$v.MqIp}}
+        couponmqinfo.a = {{$v.Messages}}
+        couponmqinfo.b = {{$v.Consumers}}
+        couponmqlist.push(couponmqinfo)
+    {{end}}
+    {{end}}
+    Morris.Bar({
+        element: 'couponmq',
+        data: couponmqlist,
+        xkey: 'y',
+        ykeys: ['a', 'b'],
+        labels: ['messages', 'consumes'],
+        hideHover: 'auto',
+        resize: true,
+        barColors: ['#ff0000', '#cacaca'],
+    });
+    var redbagmqlist = []
+    {{if .redbagMq}}
+    {{range $k, $v := .redbagMq.Mqinfos}}
+        var redbagmqinfo = {}
+        redbagmqinfo.y = "mq_"+{{$v.MqIp}}
+        redbagmqinfo.a = {{$v.Messages}}
+        redbagmqinfo.b = {{$v.Consumers}}
+        redbagmqlist.push(redbagmqinfo)
+    {{end}}
+    {{end}}
+    Morris.Bar({
+        element: 'redbagmq',
+        data: redbagmqlist,
+        xkey: 'y',
+        ykeys: ['a', 'b'],
+        labels: ['messages', 'consumes'],
+        hideHover: 'auto',
+        resize: true,
+        barColors: ['#ff0000', '#cacaca'],
+    });
+    var indexactivationlist = []
+    {{if .redbagMq}}
+    {{range $k, $v := .indexActivationMq.Mqinfos}}
+        var indexactivationmqinfo = {}
+        indexactivationmqinfo.y = "mq_"+{{$v.MqIp}}
+        indexactivationmqinfo.a = {{$v.Messages}}
+        indexactivationmqinfo.b = {{$v.Consumers}}
+        indexactivationlist.push(indexactivationmqinfo)
+    {{end}}
+    {{end}}
+    Morris.Bar({
+        element: 'indexactivation',
+        data: indexactivationlist,
+        xkey: 'y',
+        ykeys: ['a', 'b'],
+        labels: ['messages', 'consumes'],
+        hideHover: 'auto',
+        resize: true,
+        barColors: ['#ff0000', '#cacaca'],
+    });
+    var writeuseridlist = []
+    {{if .amqpWriteUserIdMq}}
+    {{range $k, $v := .amqpWriteUserIdMq.Mqinfos}}
+        var writeuseridmqinfo = {}
+        writeuseridmqinfo.y = "mq_"+{{$v.MqIp}}
+        writeuseridmqinfo.a = {{$v.Messages}}
+        writeuseridmqinfo.b = {{$v.Consumers}}
+        writeuseridlist.push(writeuseridmqinfo)
+    {{end}}
+    {{end}}
+    Morris.Bar({
+        element: 'writeuserid',
+        data: writeuseridlist,
+        xkey: 'y',
+        ykeys: ['a', 'b'],
+        labels: ['messages', 'consumes'],
+        hideHover: 'auto',
+        resize: true,
+        barColors: ['#ff0000', '#cacaca'],
+    });
+    var savedevicelist = []
+    {{if .saveDeviceInfoMq}}
+    {{range $k, $v := .saveDeviceInfoMq.Mqinfos}}
+        var savedevicemqinfo = {}
+        savedevicemqinfo.y = "mq_"+{{$v.MqIp}}
+        savedevicemqinfo.a = {{$v.Messages}}
+        savedevicemqinfo.b = {{$v.Consumers}}
+        savedevicelist.push(savedevicemqinfo)
+    {{end}}
+    {{end}}
+    Morris.Bar({
+        element: 'savedevice',
+        data: savedevicelist,
+        xkey: 'y',
+        ykeys: ['a', 'b'],
+        labels: ['messages', 'consumes'],
+        hideHover: 'auto',
+        resize: true,
+        barColors: ['#ff0000', '#cacaca'],
+    });
+    
+});
+</script>
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}

@@ -1,0 +1,167 @@
+{{ define "permission/permissionlist.html" }}
+<!DOCTYPE html>
+<html>
+{{template "header" }}
+
+<body class="pace-done">
+<div id="wrapper">
+{{template "nav" .}}
+<div id="page-wrapper" class="gray-bg">
+{{template "topbar" .}}
+{{template "functionarea" .}}
+
+ <div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="permissionMenuform" class="form-horizontal">
+                    <div class="dd" id="nestable2">
+                        <ol class="dd-list">
+                            {{if .menulist}}
+                            {{$roleId := .roleId}}
+                            {{range $k, $menus := .menulist}}
+                            <li class="dd-item dd-nodrag" data-id="{{$menus.Id}}">
+                                <div class="dd-handle">
+                                <input type="checkbox" name="parent" _id="{{$menus.Id}}" class="parent_{{$menus.Id}}" onclick="checkParent({{$menus.Id}})" id="parent_{{$menus.Id}}"  {{if eq $menus.RoleId $roleId}}checked="checked"{{end}} > 
+                                    {{$menus.Name}}  
+                                </div>
+                                <ol class="dd-list">
+                                    {{if $menus.ChildrenList}}
+                                    {{range $k, $childrenmenu := $menus.ChildrenList}}
+                                    <li class="dd-item" data-id="{{$childrenmenu.Id}}">
+                                        <div class="dd-handle">
+                                            <input type="checkbox" name="childrenids[]" class="children_parent_{{$menus.Id}}" _pid="{{$menus.Id}}" value="{{$childrenmenu.Id}}" {{if eq $childrenmenu.RoleId $roleId}}checked="checked"{{end}} onclick="checkChildren({{$menus.Id}})"> {{$childrenmenu.Name}}
+                                        </div>
+                                    </li>
+                                    {{end}}
+                                    {{end}}
+                                </ol>
+                            </li>
+                            {{ end }}
+                            {{ end }}
+                        </ol>
+                    </div> 
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">	
+                        <input type="hidden" class="form-control" id="roleid" name="roleid" value={{.roleId}}>
+                        <button class="btn btn-primary" id="save">保存</button>
+                        <button class="btn btn-white" id="cancel">取消</button>
+                    </div>
+                    </form>   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "script"}}
+<script src="/static/bootstrap/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/static/bootstrap/js/plugins/iCheck/icheck.min.js"></script>
+<script type="text/javascript">
+
+function checkParent(id){
+
+    var checked = $("#parent_"+id).is(':checked')
+    if (checked) {
+        $(".children_parent_"+id).each(function(){
+            $(this).prop("checked", true)
+        });
+    }else{
+        $(".children_parent_"+id).each(function(){
+            $(this).prop("checked", false)
+        });
+    }
+}
+
+function checkChildren(pid){
+    var falseflag = 0;
+    var trueflag = 0;
+    var i = 0
+    $(".children_parent_"+pid).each(function(){
+        i++
+        if(!$(this).is(':checked')){
+            falseflag ++
+        }else{
+            trueflag ++
+        }
+    }); 
+    if (i == falseflag) {
+        $(".parent_"+pid).prop("checked", false)
+    }
+    if (i == trueflag) {
+        $(".parent_"+pid).prop("checked", true)
+    }
+}
+
+$(document).ready(function(){
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "progressBar": true,
+      "preventDuplicates": false,
+      "positionClass": "toast-top-center",
+      "onclick": null,
+      "showDuration": "400",
+      "hideDuration": "1000",
+      "timeOut": "2000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    $('.i-checks').iCheck({
+        checkboxClass: 'icheckbox_square-green',
+        radioClass: 'iradio_square-green',
+    });
+    $("#save").click(function(){
+        $("#permissionMenuform").submit(function(){ 
+            var result=new Array();
+            $('input[name="childrenids[]"]:checked').each(function(){
+                result.push($(this).val());
+            });
+            var ids=result.join(',');
+            var roleId = $("#roleid").val();
+            $.ajax({
+                type:"POST",
+                data: {"ids":ids, "roleid":roleId},
+                url: "/permission/updatepermissionajax",
+                cache: false,
+                dataType: "json",
+                success: function(result, statues, xml){
+                    if(result.code ==1){
+                        location.href = '/permission/rolelist'
+                        return false;
+                    } 
+                    if(result.code ==0){
+                        toastr.error(result.desc); 
+                        return false;
+                    }
+                    if (result.code == 3) {
+                        location.reload();
+                        return false;
+                    }
+                },
+                error: function(){
+                    toastr.error("警告你别来烦我了");
+                    location.reload();
+                }
+            });
+            return false;
+         }); 
+    });
+    $("#cancel").click(function(){
+    	location.href = '/permission/rolelist'	
+		return false;
+    });
+  
+ });
+
+</script>
+{{template "footer"}}
+</div>
+</div>
+</body>
+</html>
+{{ end }}
